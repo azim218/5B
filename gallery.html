@@ -8,6 +8,8 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Подключаем свой CSS -->
     <link rel="stylesheet" href="styles.css">
+    <!-- Подключаем Lightbox CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
 </head>
 <body>
     <header class="bg-primary text-white text-center p-3">
@@ -26,16 +28,14 @@
     <main class="container mt-4">
         <h2 class="text-center mb-4">Фотографии Класса</h2>
         <div class="row">
-            <!-- Пример изображения -->
+            <!-- Пример изображения с Lightbox -->
             <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="Снимок экрана 2024-09-18 164814.png" class="card-img-top" alt="Фото 1">
-                    <div class="card-body">
-                        <p class="card-text">5 Б фото.</p>
-                    </div>
-                </div>
+                <a href="path/to/photo1.jpg" data-lightbox="gallery" data-title="Описание фото 1">
+                    <img src="path/to/photo1.jpg" class="img-fluid" alt="Фото 1">
+                </a>
             </div>
             <!-- Повтори для других изображений -->
+        </div>
     </main>
     <footer class="bg-dark text-white text-center p-3">
         <p>&copy; 2024 Класс 5-Б</p>
@@ -44,5 +44,8 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Подключаем Lightbox JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
 </body>
 </html>
+
