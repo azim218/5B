@@ -1,5 +1,12 @@
 const apiUrl = 'https://66fc1e6dc3a184a84d16248e.mockapi.io/api/posts';
 
+// Получение IP-адреса пользователя
+async function getUserIp() {
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    return data.ip;
+}
+
 // Функция для получения всех постов
 async function fetchPosts() {
     const response = await fetch(apiUrl);
@@ -8,7 +15,8 @@ async function fetchPosts() {
 }
 
 // Функция для отображения постов
-function displayPosts(posts) {
+async function displayPosts(posts) {
+    const userIp = await getUserIp(); // Получаем текущий IP пользователя
     const postsContainer = document.getElementById('postsContainer');
     postsContainer.innerHTML = '';
     posts.forEach(post => {
@@ -20,9 +28,29 @@ function displayPosts(posts) {
             <button class="btn btn-secondary mt-2" onclick="addComment(${post.id})">Комментировать</button>
             <div class="comments"></div>
         `;
+
+        // Проверяем, совпадает ли IP текущего пользователя с IP автора поста
+        if (userIp === post.userIp) {
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'btn btn-danger mt-2';
+            deleteButton.textContent = 'Удалить пост';
+            deleteButton.onclick = () => deletePost(post.id);
+            postElement.appendChild(deleteButton);
+        }
+
         postsContainer.appendChild(postElement);
         loadComments(postElement.querySelector('.comments'), post.comments || []); // Загрузка комментариев
     });
+}
+
+// Функция для удаления поста
+async function deletePost(postId) {
+    await fetch(`${apiUrl}/${postId}`, {
+        method: 'DELETE'
+    });
+
+    // Обновляем список постов
+    fetchPosts();
 }
 
 // Функция для загрузки комментариев
@@ -40,14 +68,15 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
     e.preventDefault(); // Предотвратить перезагрузку страницы
     const nickname = document.getElementById('nickname').value;
     const content = document.getElementById('postContent').value;
+    const userIp = await getUserIp(); // Получаем IP при создании поста
 
-    // Отправка нового поста на сервер
+    // Отправка нового поста на сервер с сохранением IP-адреса
     await fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ nickname, content, comments: [] })
+        body: JSON.stringify({ nickname, content, comments: [], userIp })
     });
 
     // Очистка полей формы
@@ -86,34 +115,7 @@ async function getPost(postId) {
     const response = await fetch(`${apiUrl}/${postId}`);
     return response.json();
 }
-// Функция для удаления поста
-async function deletePost(postId) {
-    await fetch(`${apiUrl}/${postId}`, {
-        method: 'DELETE'
-    });
-
-    // Обновляем список постов
-    fetchPosts();
-}
-
-// Добавляем кнопку для удаления постов в displayPosts
-function displayPosts(posts) {
-    const postsContainer = document.getElementById('postsContainer');
-    postsContainer.innerHTML = '';
-    posts.forEach(post => {
-        const postElement = document.createElement('div');
-        postElement.className = 'post';
-        postElement.innerHTML = `
-            <p><strong>${post.nickname}:</strong> ${post.content}</p>
-            <textarea class="form-control" placeholder="Ваш комментарий..." data-post-id="${post.id}"></textarea>
-            <button class="btn btn-secondary mt-2" onclick="addComment(${post.id})">Комментировать</button>
-            <button class="btn btn-danger mt-2" onclick="deletePost(${post.id})">Удалить пост</button>
-            <div class="comments"></div>
-        `;
-        postsContainer.appendChild(postElement);
-        loadComments(postElement.querySelector('.comments'), post.comments || []); // Загрузка комментариев
-    });
-}
 
 // Первоначальная загрузка постов
 fetchPosts();
+
