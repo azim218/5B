@@ -86,6 +86,34 @@ async function getPost(postId) {
     const response = await fetch(`${apiUrl}/${postId}`);
     return response.json();
 }
+// Функция для удаления поста
+async function deletePost(postId) {
+    await fetch(`${apiUrl}/${postId}`, {
+        method: 'DELETE'
+    });
+
+    // Обновляем список постов
+    fetchPosts();
+}
+
+// Добавляем кнопку для удаления постов в displayPosts
+function displayPosts(posts) {
+    const postsContainer = document.getElementById('postsContainer');
+    postsContainer.innerHTML = '';
+    posts.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.className = 'post';
+        postElement.innerHTML = `
+            <p><strong>${post.nickname}:</strong> ${post.content}</p>
+            <textarea class="form-control" placeholder="Ваш комментарий..." data-post-id="${post.id}"></textarea>
+            <button class="btn btn-secondary mt-2" onclick="addComment(${post.id})">Комментировать</button>
+            <button class="btn btn-danger mt-2" onclick="deletePost(${post.id})">Удалить пост</button>
+            <div class="comments"></div>
+        `;
+        postsContainer.appendChild(postElement);
+        loadComments(postElement.querySelector('.comments'), post.comments || []); // Загрузка комментариев
+    });
+}
 
 // Первоначальная загрузка постов
 fetchPosts();
