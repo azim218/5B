@@ -28,14 +28,29 @@
             <h2>Наши Новости</h2>
             <p>Тут можно разместить новости и важные события класса.</p>
         </section>
+        <section>
+            <h2>Создать пост</h2>
+            <form id="postForm">
+                <div class="form-group">
+                    <input type="text" id="nickname" class="form-control" placeholder="Введите ваш ник" required>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" id="postContent" rows="3" placeholder="Напишите свой пост..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Опубликовать</button>
+            </form>
+            <h2 class="mt-4">Посты</h2>
+            <div id="postsContainer"></div>
+        </section>
     </main>
     <footer class="bg-dark text-white text-center p-3">
         <p>&copy; 2024 Класс 5-Б</p>
     </footer>
     <!-- Подключаем Bootstrap JS и его зависимости -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
 
