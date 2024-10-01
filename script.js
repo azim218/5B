@@ -1,29 +1,17 @@
-// Проверка на наличие постов в localStorage
-let posts = JSON.parse(localStorage.getItem('posts')) || [];
+const apiUrl = 'https://66fc1e6dc3a184a84d16248e.mockapi.io/api/posts';
 
-// Добавляем обработчик события для формы постов
-document.getElementById('postForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const nickname = document.getElementById('nickname').value;
-    const postContent = document.getElementById('postContent').value;
+// Функция для получения всех постов
+async function fetchPosts() {
+    const response = await fetch(apiUrl);
+    const posts = await response.json();
+    displayPosts(posts);
+}
 
-    // Создаём новый пост и добавляем его в массив
-    const postId = posts.length + 1;
-    const post = { id: postId, nickname: nickname, content: postContent, comments: [] };
-    posts.push(post);
-
-    // Сохраняем обновлённый массив постов в localStorage
-    localStorage.setItem('posts', JSON.stringify(posts));
-    document.getElementById('nickname').value = '';
-    document.getElementById('postContent').value = '';
-    loadPosts();
-});
-
-// Функция для загрузки постов из localStorage
-function loadPosts() {
+// Функция для отображения постов
+function displayPosts(posts) {
     const postsContainer = document.getElementById('postsContainer');
     postsContainer.innerHTML = '';
-    posts.forEach((post, index) => {
+    posts.forEach(post => {
         const postElement = document.createElement('div');
         postElement.className = 'post';
         postElement.innerHTML = `
@@ -33,7 +21,7 @@ function loadPosts() {
             <div class="comments"></div>
         `;
         postsContainer.appendChild(postElement);
-        loadComments(postElement.querySelector('.comments'), post.comments); // Загрузка комментариев для каждого поста
+        loadComments(postElement.querySelector('.comments'), post.comments || []); // Загрузка комментариев
     });
 }
 
@@ -47,19 +35,57 @@ function loadComments(commentsContainer, comments) {
     });
 }
 
-// Функция для добавления комментария
-function addComment(postId) {
-    const post = posts.find(p => p.id === postId);
-    const commentInput = document.querySelector(`textarea[data-post-id="${postId}"]`);
-    const commentContent = commentInput.value;
+// Обработчик события отправки формы
+document.getElementById('postForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); // Предотвратить перезагрузку страницы
+    const nickname = document.getElementById('nickname').value;
+    const content = document.getElementById('postContent').value;
 
-    if (post && commentContent) {
-        post.comments.push(commentContent);
-        localStorage.setItem('posts', JSON.stringify(posts));
-        commentInput.value = '';
-        loadPosts(); // Обновляем посты, чтобы показать новый комментарий
+    // Отправка нового поста на сервер
+    await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ nickname, content, comments: [] })
+    });
+
+    // Очистка полей формы
+    document.getElementById('nickname').value = '';
+    document.getElementById('postContent').value = '';
+
+    // Обновление списка постов
+    fetchPosts();
+});
+
+// Функция для добавления комментария
+async function addComment(postId) {
+    const postContent = document.querySelector(`textarea[data-post-id="${postId}"]`).value;
+
+    if (postContent) {
+        // Отправка комментария на сервер
+        const post = await getPost(postId);
+        await fetch(`${apiUrl}/${postId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ comments: [...post.comments, postContent] })
+        });
+
+        // Очистка поля ввода комментария
+        document.querySelector(`textarea[data-post-id="${postId}"]`).value = '';
+
+        // Обновление списка постов
+        fetchPosts();
     }
 }
 
-// Загружаем посты при загрузке страницы
-loadPosts();
+// Функция для получения поста по ID
+async function getPost(postId) {
+    const response = await fetch(`${apiUrl}/${postId}`);
+    return response.json();
+}
+
+// Первоначальная загрузка постов
+fetchPosts();
