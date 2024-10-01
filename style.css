@@ -30,4 +30,45 @@ nav ul li a {
 .gallery-grid img {
     width: 100%;
     height: auto;
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+nav ul li {
+    display: inline;
+    margin-right: 10px;
+}
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+footer {
+    background: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+.post {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+}
+.comment {
+    margin-top: 10px;
+    padding: 5px;
+    background: #f9f9f9;
+}
+
 }
