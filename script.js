@@ -118,4 +118,3 @@ async function getPost(postId) {
 
 // Первоначальная загрузка постов
 fetchPosts();
-
