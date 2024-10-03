@@ -23,8 +23,13 @@ async function displayPosts(posts) {
         const postElement = document.createElement('div');
         postElement.className = 'post';
         postElement.innerHTML = `
-            <p><strong>${post.nickname}:</strong> ${post.content}</p>
-            <textarea class="form-control" placeholder="Ваш комментарий..." data-post-id="${post.id}"></textarea>
+            <div class="post-header">
+                <img src="https://www.gravatar.com/avatar/${md5(post.nickname)}?s=40" alt="avatar" class="avatar">
+                <strong>${post.nickname}</strong>
+                <span class="post-time">${new Date().toLocaleString()}</span>
+            </div>
+            <p>${post.content}</p>
+            <textarea class="form-control mt-2" placeholder="Ваш комментарий..." data-post-id="${post.id}"></textarea>
             <button class="btn btn-secondary mt-2" onclick="addComment(${post.id})">Комментировать</button>
             <div class="comments"></div>
         `;
@@ -48,9 +53,7 @@ async function deletePost(postId) {
     await fetch(`${apiUrl}/${postId}`, {
         method: 'DELETE'
     });
-
-    // Обновляем список постов
-    fetchPosts();
+    fetchPosts(); // Обновляем список постов
 }
 
 // Функция для загрузки комментариев
@@ -58,7 +61,14 @@ function loadComments(commentsContainer, comments) {
     comments.forEach(comment => {
         const commentElement = document.createElement('div');
         commentElement.className = 'comment';
-        commentElement.textContent = comment;
+        commentElement.innerHTML = `
+            <div class="comment-header">
+                <img src="https://www.gravatar.com/avatar/${md5(comment.nickname)}?s=30" alt="avatar" class="comment-avatar">
+                <strong>${comment.nickname}</strong>
+                <span class="comment-time">${new Date().toLocaleTimeString()}</span>
+            </div>
+            <p>${comment.text}</p>
+        `;
         commentsContainer.appendChild(commentElement);
     });
 }
@@ -82,31 +92,24 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
     // Очистка полей формы
     document.getElementById('nickname').value = '';
     document.getElementById('postContent').value = '';
-
-    // Обновление списка постов
-    fetchPosts();
+    fetchPosts(); // Обновляем список постов
 });
 
 // Функция для добавления комментария
 async function addComment(postId) {
-    const postContent = document.querySelector(`textarea[data-post-id="${postId}"]`).value;
+    const commentText = document.querySelector(`textarea[data-post-id="${postId}"]`).value;
+    const nickname = document.getElementById('nickname').value;
 
-    if (postContent) {
-        // Отправка комментария на сервер
+    if (commentText) {
         const post = await getPost(postId);
         await fetch(`${apiUrl}/${postId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ comments: [...post.comments, postContent] })
+            body: JSON.stringify({ comments: [...post.comments, { nickname, text: commentText }] })
         });
-
-        // Очистка поля ввода комментария
-        document.querySelector(`textarea[data-post-id="${postId}"]`).value = '';
-
-        // Обновление списка постов
-        fetchPosts();
+        fetchPosts(); // Обновляем список постов
     }
 }
 
@@ -118,3 +121,4 @@ async function getPost(postId) {
 
 // Первоначальная загрузка постов
 fetchPosts();
+
